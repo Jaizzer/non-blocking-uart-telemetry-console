@@ -10,6 +10,14 @@ int main(void) {
     RCC->APB1ENR &= ~RCC_APB1ENR_USART2EN_Msk;
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 
+    // Set the mantissa part of 104.1875
+    USART2->BRR &= ~USART_BRR_DIV_Mantissa_Msk;
+    USART2->BRR |= (104U << 4);
+
+    // Set the fraction part of 104.1875, 0.1875 * 16 = 3
+    USART2->BRR &= ~USART_BRR_DIV_Fraction_Msk;
+    USART2->BRR |= (3 << 0);
+
     while (1) {
     }
 }
