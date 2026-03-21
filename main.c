@@ -18,6 +18,17 @@ int main(void) {
     USART2->BRR &= ~USART_BRR_DIV_Fraction_Msk;
     USART2->BRR |= (3 << 0);
 
+    // Set the USART2 CR1 register values to 8N1 (no parity) Configuration
+    USART2->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
+
+    // Wait for the hardware to be ready in sending data
+    // This condition will only work if USART2's bit 7 is 1
+    while (!(USART2->SR & USART_SR_TXE)) {
+    };
+
+    // Set the value to be sent by the UART
+    USART2->DR = 38;
+
     while (1) {
     }
 }
