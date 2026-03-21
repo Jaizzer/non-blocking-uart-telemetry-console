@@ -19,7 +19,7 @@ int main(void) {
     USART2->BRR |= (3 << 0);
 
     // Set the USART2 CR1 register values to 8N1 (no parity) Configuration
-    USART2->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
+    USART2->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8;
 
     // Wait for the hardware to be ready in sending data
     // This condition will only work if USART2's bit 7 is 1
