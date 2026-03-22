@@ -6,6 +6,22 @@ int main(void) {
     RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN_Msk;
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 
+    // Make PA2 alternate function so that it can be controlled by the USART
+    GPIOA->MODER &= ~GPIO_MODER_MODE2_Msk;
+    GPIOA->MODER |= GPIO_MODER_MODE2_1;
+
+    // Make PA3 alternate function so that it can be controlled by the USART
+    GPIOA->MODER &= ~GPIO_MODER_MODE3_Msk;
+    GPIOA->MODER |= GPIO_MODER_MODE3_1;
+
+    // Wire PA2 to AF7 (0111) which maps to USART
+    GPIOA->AFR[0] &= ~(15 << 8);
+    GPIOA->AFR[0] |= (7 << 8);
+
+    // Wire PA3 to AF7 (0111) which maps to USART
+    GPIOA->AFR[0] &= ~(15 << 12);
+    GPIOA->AFR[0] |= (7 << 12);
+
     // Enable USART2
     RCC->APB1ENR &= ~RCC_APB1ENR_USART2EN_Msk;
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
