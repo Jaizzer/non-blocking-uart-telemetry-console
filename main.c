@@ -78,6 +78,9 @@ int main(void) {
     // Set the USART2 CR1 register values to 8N1 (no parity) Configuration
     USART2->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8;
 
+    // Enable interrupts for USART2 when it receives data
+    USART2->CR1 |= USART_CR1_RXNEIE;
+
     // Wait for the hardware to be ready in sending data
     // This condition will only work if USART2's bit 7 is 1
     while (!(USART2->SR & USART_SR_TXE)) {
@@ -86,7 +89,19 @@ int main(void) {
     // Set the value to be sent by the UART
     USART2->DR = 38;
 
+    // Set interrupt for USART2
+    NVIC_SetPriority(USART2_IRQn, 1);
+    NVIC_EnableIRQ(USART2_IRQn);
+
     while (1) {
+    }
+}
+
+void USART2_IRQHandler(void) {
+    // Check if the interrupt was caused by receiving a data
+    if (USART2->SR & USART_SR_RXNE) {
+        uint8_t data = (uint8_t)USART2->DR;
+        rb_write(data);
     }
 }
 
