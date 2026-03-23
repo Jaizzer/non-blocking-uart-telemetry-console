@@ -1,6 +1,45 @@
 #include "stm32f411xe.h"
 #include <stdint.h>
 
+// Set buffer size to 64 bytes
+#define RB_SIZE 64
+
+typedef struct {
+    // Each element in buffer is 1 byte since its uint8_t
+    uint8_t buffer[RB_SIZE];
+
+    // Use 32-bit for the pointers
+    volatile uint32_t head;
+    volatile uint32_t tail;
+} RingBuffer;
+
+RingBuffer rx_fifo = {{0}, 0, 0};
+
+void rb_write(uint8_t byte) {
+    // Calculate the next position
+    uint32_t next = (rx_fifo.head + 1) % RB_SIZE;
+
+    // Check if the next
+    if (next != rx_fifo.tail) {
+        rx_fifo.buffer[rx_fifo.head] = byte;
+        rx_fifo.head = next;
+    }
+};
+
+uint8_t rb_read(void) {
+    // Get the current byte
+    uint8_t byte = rx_fifo.buffer[rx_fifo.tail];
+
+    // Move to the next byte
+    uint32_t next = (rx_fifo.tail + 1) % RB_SIZE;
+    rx_fifo.tail = next;
+
+    // Return the currently stored byte
+    return byte;
+}
+
+int rb_is_empty(void) { return rx_fifo.tail == rx_fifo.head; }
+
 int main(void) {
     // Enable GPIO A
     RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN_Msk;
