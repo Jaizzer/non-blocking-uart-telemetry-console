@@ -21,7 +21,10 @@ void rb_write(uint8_t byte) {
 
     // Check if the next
     if (next != rx_fifo.tail) {
+        // Write the byte to the current slot
         rx_fifo.buffer[rx_fifo.head] = byte;
+
+        // Move the head to the next byte
         rx_fifo.head = next;
     }
 };
@@ -31,8 +34,7 @@ uint8_t rb_read(void) {
     uint8_t byte = rx_fifo.buffer[rx_fifo.tail];
 
     // Move to the next byte
-    uint32_t next = (rx_fifo.tail + 1) % RB_SIZE;
-    rx_fifo.tail = next;
+    rx_fifo.tail = (rx_fifo.tail + 1) % RB_SIZE;
 
     // Return the currently stored byte
     return byte;
