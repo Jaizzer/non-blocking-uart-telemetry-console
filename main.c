@@ -47,6 +47,10 @@ int main(void) {
     RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN_Msk;
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 
+    // Make PA5 (Green LED) receive output
+    GPIOA->MODER &= ~GPIO_MODER_MODE5_Msk;
+    GPIOA->MODER |= GPIO_MODER_MODE5_0;
+
     // Make PA2 alternate function so that it can be controlled by the USART
     GPIOA->MODER &= ~GPIO_MODER_MODE2_Msk;
     GPIOA->MODER |= GPIO_MODER_MODE2_1;
@@ -93,7 +97,29 @@ int main(void) {
     NVIC_SetPriority(USART2_IRQn, 1);
     NVIC_EnableIRQ(USART2_IRQn);
 
+    // Force LED ON during startup for 1 second
+    GPIOA->BSRR = GPIO_BSRR_BS5;
+    for (int i = 0; i < 1000000; i++)
+        ; // Crude delay
+    GPIOA->BSRR = GPIO_BSRR_BR5;
+
     while (1) {
+        // 1. Check if the belt has sushi
+        if (!rb_is_empty()) {
+            uint8_t data = rb_read();
+
+            // 2. MIRROR: Send the exact same byte back to the Mac
+            while (!(USART2->SR & USART_SR_TXE))
+                ;
+            USART2->DR = data;
+
+            // 3. LOGIC: Control the LED
+            if (data == 'H') {
+                GPIOA->BSRR = GPIO_BSRR_BS5; // ON
+            } else if (data == 'I') {
+                GPIOA->BSRR = GPIO_BSRR_BR5; // OFF
+            }
+        }
     }
 }
 
