@@ -51,25 +51,25 @@ int main(void) {
     GPIOA->MODER &= ~GPIO_MODER_MODE5_Msk;
     GPIOA->MODER |= GPIO_MODER_MODE5_0;
 
-    // Make PA2 alternate function so that it can be controlled by the USART
-    GPIOA->MODER &= ~GPIO_MODER_MODE2_Msk;
-    GPIOA->MODER |= GPIO_MODER_MODE2_1;
+    // Make PA9 alternate function so that it can be controlled by the USART6
+    GPIOA->MODER &= ~GPIO_MODER_MODE9_Msk;
+    GPIOA->MODER |= GPIO_MODER_MODE9_1;
 
-    // Make PA3 alternate function so that it can be controlled by the USART
-    GPIOA->MODER &= ~GPIO_MODER_MODE3_Msk;
-    GPIOA->MODER |= GPIO_MODER_MODE3_1;
+    // Make PA10 alternate function so that it can be controlled by the USART6
+    GPIOA->MODER &= ~GPIO_MODER_MODE10_Msk;
+    GPIOA->MODER |= GPIO_MODER_MODE10_1;
 
-    // Wire PA2 to AF7 (0111) which maps to USART
-    GPIOA->AFR[0] &= ~(15 << 8);
-    GPIOA->AFR[0] |= (7 << 8);
+    // Wire PA9 to AF8 (1000) which maps to USART6
+    GPIOA->AFR[1] &= ~(15 << 4);
+    GPIOA->AFR[1] |= (8 << 4);
 
-    // Wire PA3 to AF7 (0111) which maps to USART
-    GPIOA->AFR[0] &= ~(15 << 12);
-    GPIOA->AFR[0] |= (7 << 12);
+    // Wire PA10 to AF8 (1000) which maps to USART6
+    GPIOA->AFR[1] &= ~(15 << 8);
+    GPIOA->AFR[1] |= (8 << 8);
 
-    // Enable USART2
-    RCC->APB1ENR &= ~RCC_APB1ENR_USART2EN_Msk;
-    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
+    // Enable USART6
+    RCC->APB2ENR &= ~RCC_APB2ENR_USART6EN_Msk;
+    RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
 
     // Set the mantissa part of 104.1875
     USART2->BRR &= ~USART_BRR_DIV_Mantissa_Msk;
