@@ -84,9 +84,26 @@ int main(void) {
     }
 }
 
+/**
+ * @brief  Interrupt Service Routine for USART6.
+ * This function is called automatically by the hardware
+ * whenever a UART event (like receiving a byte) occurs.
+ */
 void USART6_IRQHandler(void) {
+
+    // 1. Check the Status Register (SR) for the 'Read Data Register Not Empty' flag (RXNE).
+    //    This confirms that the interrupt was triggered because a byte was actually received.
     if (USART6->SR & USART_SR_RXNE) {
-        rb_write((uint8_t)USART6->DR);
+
+        // 2. Read the 8-bit data from the Data Register (DR).
+        //    IMPORTANT: The act of reading USART6->DR automatically clears the RXNE flag
+        //    in the hardware, telling the STM32 we have handled this byte.
+        uint8_t received_byte = (uint8_t)USART6->DR;
+
+        // 3. Place the received byte into our "sushi belt" (Ring Buffer).
+        //    This allows the main loop to process the data later without
+        //    slowing down the high-speed UART reception.
+        rb_write(received_byte);
     }
 }
 
