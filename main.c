@@ -93,6 +93,7 @@ void USART6_IRQHandler(void) {
 
     // 1. Check the Status Register (SR) for the 'Read Data Register Not Empty' flag (RXNE).
     //    This confirms that the interrupt was triggered because a byte was actually received.
+    // This condition AND condition will only become 00000000 if  the bit corresponding to USART_SR_RXNE in SR are not equal
     if (USART6->SR & USART_SR_RXNE) {
 
         // 2. Read the 8-bit data from the Data Register (DR).
