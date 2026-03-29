@@ -4,6 +4,7 @@
 #define RB_SIZE 64
 
 typedef struct {
+    // Use uint8_t since each buffer item are 8-bits (1 byte) long 
     uint8_t buffer[RB_SIZE];
     volatile uint32_t head;
     volatile uint32_t tail;
