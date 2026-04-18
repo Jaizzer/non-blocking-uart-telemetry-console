@@ -11,6 +11,8 @@ typedef struct {
     volatile uint32_t tail;
 } RingBuffer;
 
+// {0} fills the bugger array with zero
+// While the two other zeros sets the head and tail pointer to zero
 RingBuffer rx_fifo = {{0}, 0, 0};
 
 void rb_write(uint8_t byte) {
