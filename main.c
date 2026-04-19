@@ -106,6 +106,7 @@ int main(void) {
     USART6->DR = '&';
 
     while (1) {
+        // This while loop will keep running, waiting for ring buffer to be non-empty
         // 1. Check the "Inbox" (Ring Buffer)
         // If head != tail, the interrupt has dropped off new data from the Mac.
         if (!rb_is_empty()) {
