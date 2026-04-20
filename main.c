@@ -93,6 +93,8 @@ int main(void) {
 
     // Startup Signal (Blink LED)
     GPIOA->BSRR = GPIO_BSRR_BS5;
+
+    // Wait for some second to turn the LED off again
     for (int i = 0; i < 1000000; i++)
         __asm__("nop");
     GPIOA->BSRR = GPIO_BSRR_BR5;
