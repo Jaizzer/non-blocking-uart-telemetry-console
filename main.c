@@ -7,7 +7,11 @@
 typedef struct {
     // Use uint8_t since each buffer item are 8-bits (1 byte) long 
     uint8_t buffer[RB_SIZE];
+
+    // This pointer is the one used for writing
     volatile uint32_t head;
+
+    // This pointer is the one used for reading
     volatile uint32_t tail;
 } RingBuffer;
 
