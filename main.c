@@ -45,6 +45,7 @@ uint8_t rb_read(void) {
     return byte;
 }
 
+// This function checks whether the ring buffer is empty
 int rb_is_empty(void) { return rx_fifo.tail == rx_fifo.head; }
 
 int main(void) {
