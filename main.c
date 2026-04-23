@@ -5,7 +5,7 @@
 #define RB_SIZE 64
 
 typedef struct {
-    // Use uint8_t since each buffer item are 8-bits (1 byte) long 
+    // Use uint8_t since each buffer item are 8-bits (1 byte) long
     uint8_t buffer[RB_SIZE];
 
     // This pointer is the one used for writing
@@ -70,20 +70,21 @@ int main(void) {
     // Map to AF8 (USART6), clear the bits though.
     GPIOA->AFR[1] &= ~(0xF << 4 | 0xF << 8);
 
-    // Pin 9 takes the second "4-bits" starting at bit 4, Pint 10 takes thethird "4-bits" starting at bit 8 
+    // Pin 9 takes the second "4-bits" starting at bit 4, Pint 10 takes thethird "4-bits" starting
+    // at bit 8
     GPIOA->AFR[1] |= (8 << 4) | (8 << 8);
 
     // 4. Configure USART6 Baud Rate (9600 @ 16MHz)
-    // The BRR (Baud Rate Register) is a frequency divider. 
+    // The BRR (Baud Rate Register) is a frequency divider.
     // Calculation for 9600 baud with a 16MHz clock:
     // USARTDIV = 16,000,000 / (16 * 9600) = 104.1667
-    // 
+    //
     // Mantissa (Whole number) = 104 -> This goes into bits [15:4]
     // Fraction = 0.1667 * 16 (since the fraction slot is 4-bits wide) = 2.667
     // We round 2.667 up to 3 -> This goes into bits [3:0]
-    USART6->BRR = (104U << 4) | (3U << 0); 
+    USART6->BRR = (104U << 4) | (3U << 0);
 
-    // 5. CR1 Config: Master Enable, turn on Talk (TX) and Listen (RX), 
+    // 5. CR1 Config: Master Enable, turn on Talk (TX) and Listen (RX),
     // and enable the "New Data" Interrupt so we don't have to wait manually.
     USART6->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
 
@@ -92,7 +93,7 @@ int main(void) {
     // This ensures UART data is handled quickly even if the CPU is busy.
     NVIC_SetPriority(USART6_IRQn, 1);
 
-    // Open the gate for USART6 interrupts. Without this, the CPU will 
+    // Open the gate for USART6 interrupts. Without this, the CPU will
     // ignore the signals coming from the USART6 peripheral.
     NVIC_EnableIRQ(USART6_IRQn);
 
@@ -117,18 +118,18 @@ int main(void) {
         // 1. Check the "Inbox" (Ring Buffer)
         // If head != tail, the interrupt has dropped off new data from the Mac.
         if (!rb_is_empty()) {
-            
+
             // 2. Retrieve the oldest byte from the software warehouse (RAM).
             uint8_t data = rb_read();
 
             /* --- ECHO BACK LOGIC --- */
-            
+
             // 3. Wait for the "Loading Dock" (Transmit Data Register) to be clear.
             // The TXE bit is 1 when empty. We stay in this loop as long as TXE is 0 (Busy).
             while (!(USART6->SR & USART_SR_TXE))
                 ;
 
-            // 4. "Return to Sender": By writing the byte back into the DR, 
+            // 4. "Return to Sender": By writing the byte back into the DR,
             // the hardware automatically pulses it out the TX wire (PA9) to your Mac.
             USART6->DR = data;
 
@@ -137,11 +138,12 @@ int main(void) {
             // 5. Action Phase: Check if the character is a specific command.
             if (data == 'H') {
                 // Bit Set: Turns PA5 (LED) ON
-                GPIOA->BSRR = GPIO_BSRR_BS5; 
-            } 
-            else if (data == 'I') {
+                // BR5 corresponds to Bit Set 5
+                GPIOA->BSRR = GPIO_BSRR_BS5;
+            } else if (data == 'I') {
                 // Bit Reset: Turns PA5 (LED) OFF
-                GPIOA->BSRR = GPIO_BSRR_BR5; 
+                // BR5 corresponds to Bit Reset 5
+                GPIOA->BSRR = GPIO_BSRR_BR5;
             }
         }
     }
