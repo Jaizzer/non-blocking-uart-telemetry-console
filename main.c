@@ -49,30 +49,31 @@ uint8_t rb_read(void) {
 int rb_is_empty(void) { return rx_fifo.tail == rx_fifo.head; }
 
 int main(void) {
-    // 1. Enable GPIOA and USART6 Clocks
+    // 1. Enable GPIOA, and GPIOC and USART6 Clocks
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
     RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
 
     // 2. Configure PA5 (LED)
     GPIOA->MODER &= ~GPIO_MODER_MODE5_Msk;
     GPIOA->MODER |= GPIO_MODER_MODE5_0;
 
-    // First, "erase" the current Job Description for pins 9 and 10.
-    // GPIO_MODER_MODE9_Msk is 0b11. Using &= ~ forces both bits to 00 (Input mode).
+    // First, "erase" the current Job Description for PC6 and PC7.
+    // GPIO_MODER_MODE6_Msk is 0b11. Using &= ~ forces both bits to 00 (Input mode).
     // This ensures we have a clean slate before assigning a new mode.
-    GPIOA->MODER &= ~(GPIO_MODER_MODE9_Msk | GPIO_MODER_MODE10_Msk);
+    GPIOC->MODER &= ~(GPIO_MODER_MODE6_Msk | GPIO_MODER_MODE7_Msk);
 
     // Now, assign the 'Alternate Function' job description (Binary 10).
     // We use the _1 suffix because it targets the "left-hand" bit of the 2-bit pair.
     // This tells the pins: "You are no longer general GPIO; you are now specialists."
-    GPIOA->MODER |= (GPIO_MODER_MODE9_1 | GPIO_MODER_MODE10_1);
+    GPIOC->MODER |= (GPIO_MODER_MODE6_1 | GPIO_MODER_MODE7_1);
 
     // Map to AF8 (USART6), clear the bits though.
-    GPIOA->AFR[1] &= ~(0xF << 4 | 0xF << 8);
+    GPIOC->AFR[0] &= ~(0xF << 24 | 0xF << 28);
 
-    // Pin 9 takes the second "4-bits" starting at bit 4, Pint 10 takes thethird "4-bits" starting
+    // PC6 takes the second "4-bits" starting at bit 4, PC7 takes the third "4-bits" starting
     // at bit 8
-    GPIOA->AFR[1] |= (8 << 4) | (8 << 8);
+    GPIOC->AFR[0] |= (8 << 24) | (8 << 28);
 
     // 4. Configure USART6 Baud Rate (9600 @ 16MHz)
     // The BRR (Baud Rate Register) is a frequency divider.
